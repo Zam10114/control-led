@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Control de Bomba</title>
+</head>
+<body>
+
+<h2>Control de Bomba</h2>
+
+<button onclick="encender()">ENCENDER</button>
+<button onclick="apagar()">APAGAR</button>
+
+<p id="estado">Estado: ...</p>
+
+<script>
+
+// CONFIGURA ESTO
+const WRITE_API_KEY = "0SAV3JYO498GP4CM";
+const READ_API_KEY  = "TNGVGBPZT3ARAYI4";
+const CHANNEL_ID = "3435360";
+
+// ENCENDER
+function encender() {
+
+  fetch(`https://api.thingspeak.com/update?api_key=${WRITE_API_KEY}&field1=1`)
+  .then(() => {
+    alert("Comando ENCENDER enviado");
+  });
+
+}
+
+// APAGAR
+function apagar() {
+
+  fetch(`https://api.thingspeak.com/update?api_key=${WRITE_API_KEY}&field1=0`)
+  .then(() => {
+    alert("Comando APAGAR enviado");
+  });
+
+}
+
+// LEER ESTADO
+function leerEstado() {
+
+  fetch(`https://api.thingspeak.com/channels/${CHANNEL_ID}/fields/2/last.txt?api_key=${READ_API_KEY}`)
+  .then(res => res.text())
+  .then(data => {
+
+    if(data.trim() === "1") {
+      document.getElementById("estado").innerText = "Estado: ENCENDIDO";
+    } else {
+      document.getElementById("estado").innerText = "Estado: APAGADO";
+    }
+
+  });
+
+}
+
+// ACTUALIZA CADA 5 SEGUNDOS
+setInterval(leerEstado, 5000);
+
+</script>
+
+</body>
+</html>
