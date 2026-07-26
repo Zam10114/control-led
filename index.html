@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Pozo Inteligente</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            color: white;
+            text-align: center;
+        }
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #1e293b;
+            padding: 20px;
+            margin: 15px;
+            border-radius: 10px;
+        }
+
+        .value {
+            font-size: 2em;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 15px;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .on {
+            background: green;
+            color: white;
+        }
+
+        .off {
+            background: red;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<h1>💧 Pozo Inteligente</h1>
+
+<div class="card">
+    <h2>Estado de la bomba</h2>
+    <div id="estado" class="value">Cargando...</div>
+    <button id="toggleBtn" onclick="toggleBomba()">Encender / Apagar</button>
+</div>
+
+<div class="card">
+    <h2>🌡️ Temperatura</h2>
+    <div id="temp" class="value">-- °C</div>
+</div>
+
+<div class="card">
+    <h2>💧 Humedad</h2>
+    <div id="hum" class="value">-- %</div>
+</div>
+
+<script>
+    // 🔑 TU CONFIGURACIÓN (REEMPLAZA ESTO)
+    const CHANNEL_ID = "3435360";
+    const READ_API_KEY = "TNGVGBPZT3ARAYI4";
+    const WRITE_API_KEY = "0SAV3JYO498GP4CM";
+
+    let estadoActual = 0;
+
+    async function obtenerDatos() {
+        try {
+            const url = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds/last.json?api_key=${READ_API_KEY}`;
+            const res = await fetch(url);
+            const data = await res.json();
+
+            // Campos:
+            // field1 = comando (1 ON / 0 OFF)
+            // field2 = estado bomba
+            // field3 = temperatura
+            // field4 = humedad
+
+            estadoActual = data.field2;
+
+            document.getElementById("estado").innerText = estadoActual == 1 ? "ENCENDIDA" : "APAGADA";
+            document.getElementById("temp").innerText = data.field3 + " °C";
+            document.getElementById("hum").innerText = data.field4 + " %";
+
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    }
+
+    async function toggleBomba() {
+        let nuevoEstado = estadoActual == 1 ? 0 : 1;
+
+        const url = `https://api.thingspeak.com/update?api_key=${WRITE_API_KEY}&field1=${nuevoEstado}`;
+        
+        try {
+            await fetch(url);
+            alert("Comando enviado");
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    // Actualizar cada 10 segundos
+    setInterval(obtenerDatos, 10000);
+    obtenerDatos();
+</script>
+
+</body>
+</html>
