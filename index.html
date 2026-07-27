@@ -52,10 +52,20 @@
 
 <h1>💧 Pozo Inteligente</h1>
 
+<!-- 
 <div class="card">
     <h2>Estado de la bomba</h2>
     <div id="estado" class="value">Cargando...</div>
     <button id="toggleBtn" onclick="toggleBomba()">Encender / Apagar</button>
+</div> 
+-->
+
+<div class="card">
+    <h2>Estado de la bomba</h2>
+    <div id="estado" class="value">Cargando...</div>
+
+    <button class="on" onclick="encenderBomba()">Encender</button>
+    <button class="off" onclick="apagarBomba()">Apagar</button>
 </div>
 
 <div class="card">
@@ -99,18 +109,40 @@
         }
     }
 
-    async function toggleBomba() {
-        let nuevoEstado = estadoActual == 1 ? 0 : 1;
+    async function encenderBomba() {
+    const url = `https://api.thingspeak.com/update?api_key=${WRITE_API_KEY}&field1=1`;
 
-        const url = `https://api.thingspeak.com/update?api_key=${WRITE_API_KEY}&field1=${nuevoEstado}`;
-        
-        try {
-            await fetch(url);
-            alert("Comando enviado");
-        } catch (error) {
-            console.error(error);
-        }
+    try {
+        await fetch(url);
+        alert("Bomba ENCENDIDA");
+    } catch (error) {
+        console.error(error);
     }
+}
+
+async function apagarBomba() {
+    const url = `https://api.thingspeak.com/update?api_key=${WRITE_API_KEY}&field1=0`;
+
+    try {
+        await fetch(url);
+        alert("Bomba APAGADA");
+    } catch (error) {
+        console.error(error);
+    }
+}
+
+    //async function toggleBomba() {
+    //    let nuevoEstado = estadoActual == 1 ? 0 : 1;
+    //
+    //    const url = `https://api.thingspeak.com/update?api_key=${WRITE_API_KEY}&field1=${nuevoEstado}`;
+    //    
+    //    try {
+    //        await fetch(url);
+    //        alert("Comando enviado");
+    //    } catch (error) {
+    //        console.error(error);
+    //    }
+    //}
 
     // Actualizar cada 10 segundos
     setInterval(obtenerDatos, 10000);
